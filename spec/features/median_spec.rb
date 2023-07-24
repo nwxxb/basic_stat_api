@@ -5,14 +5,20 @@ RSpec.describe 'calculate median/middle value' do
 
   describe "median" do
     it "return correct middle value" do
-      post '/median', data: [3, 1, 3, 7, 6, 9, 8]
+      header 'CONTENT_TYPE', 'application/json'
+      header 'ACCEPT', 'application/xml'
+
+      post '/median', {data: [3, 1, 3, 7, 6, 9, 8]}.to_json
       expect(last_response.ok?).to be_truthy
       expect(last_response.content_type).to eq('application/json')
       expect(JSON.parse(last_response.body)['median']).to be_within(0.01).of(6)
     end
 
     it "return correct median" do
-      post '/median', data: [3, 5, 2, 2, 8, 6, 8, 9]
+      header 'CONTENT_TYPE', 'application/json'
+      header 'ACCEPT', 'application/xml'
+
+      post '/median', {data: [3, 5, 2, 2, 8, 6, 8, 9]}.to_json
       expect(last_response.ok?).to be_truthy
       expect(last_response.content_type).to eq('application/json')
       expect(JSON.parse(last_response.body)['median']).to be_within(0.01).of(5.5)
