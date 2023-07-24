@@ -6,7 +6,8 @@ class StatApi < Sinatra::Base
   post "/mean" do
     content_type 'application/json'
 
-    mean = params['data'].map(&:to_i).sum(0.0) / params['data'].length
+    data = JSON.parse(request.body.read)['data']
+    mean = data.sum(0.0) / data.length
 
     return { mean: mean }.to_json
   end
@@ -14,7 +15,8 @@ class StatApi < Sinatra::Base
   post "/median" do
     content_type 'application/json'
 
-    sorted_values = params['data'].map(&:to_i).sort
+    data = JSON.parse(request.body.read)['data']
+    sorted_values = data.sort
     if sorted_values.length.odd?
       median = sorted_values[((sorted_values.length + 1) / 2) - 1]
     else
@@ -30,7 +32,8 @@ class StatApi < Sinatra::Base
   post "/mode" do
     content_type 'application/json'
 
-    value_count = params['data'].map(&:to_i)
+    data = JSON.parse(request.body.read)['data']
+    value_count = data.map
       .inject({}) do |counter, val|
         if counter[val].nil?
           counter[val] = 1
