@@ -1,9 +1,12 @@
+# frozen_string_literal: true
+
+# Class that contains all required endpoints
 class StatApi < Sinatra::Base
-  get "/ping" do
+  get '/ping' do
     'pong'
   end
 
-  post "/mean" do
+  post '/mean' do
     content_type 'application/json'
 
     data = JSON.parse(request.body.read)['data']
@@ -12,39 +15,37 @@ class StatApi < Sinatra::Base
     return { mean: mean }.to_json
   end
 
-  post "/median" do
+  post '/median' do
     content_type 'application/json'
 
     data = JSON.parse(request.body.read)['data']
     sorted_values = data.sort
-    if sorted_values.length.odd?
-      median = sorted_values[((sorted_values.length + 1) / 2) - 1]
-    else
-      median = [
-        sorted_values[((sorted_values.length + 1) / 2.0).ceil - 1], 
-        sorted_values[((sorted_values.length) / 2) - 1]
-      ].sum(0.0) / 2
-    end
+    median = if sorted_values.length.odd?
+               sorted_values[((sorted_values.length + 1) / 2) - 1]
+             else
+               [
+                 sorted_values[((sorted_values.length + 1) / 2.0).ceil - 1],
+                 sorted_values[(sorted_values.length / 2) - 1]
+               ].sum(0.0) / 2
+             end
 
     return { median: median }.to_json
   end
 
-  post "/mode" do
+  post '/mode' do
     content_type 'application/json'
 
     data = JSON.parse(request.body.read)['data']
     value_count = data.map
-      .inject({}) do |counter, val|
-        if counter[val].nil?
-          counter[val] = 1
-        else
-          counter[val] = counter[val] + 1
-        end
+                      .each_with_object({}) do |val, counter|
+      counter[val] = if counter[val].nil?
+                       1
+                     else
+                       counter[val] + 1
+                     end
+    end
 
-        counter
-      end
-
-    mode = value_count.select do |key, value|
+    mode = value_count.select do |_, value|
       value == value_count.values.max
     end.keys
 

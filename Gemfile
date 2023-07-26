@@ -1,13 +1,19 @@
 # frozen_string_literal: true
 
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-gem "sinatra"
-gem "rack"
-gem "puma"
-gem "yard"
-gem "pry"
+gem 'puma'
+gem 'rack'
+gem 'sinatra'
+
+group :development, :test do
+  gem 'pry'
+  gem 'ripper-tags', require: false
+  gem 'rubocop', '~> 1.54', require: false
+  gem 'rubocop-rspec', '~> 2.22', require: false
+end
+
 group :test do
-  gem "rspec"
-  gem "rack-test", '~> 2.1'
+  gem 'rack-test', '~> 2.1'
+  gem 'rspec'
 end
