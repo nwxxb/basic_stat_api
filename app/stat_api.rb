@@ -2,6 +2,8 @@
 
 # Class that contains all required endpoints
 class StatApi < Sinatra::Base
+  use Rack::PostBodyContentTypeParser
+
   get '/ping' do
     'pong'
   end
@@ -12,7 +14,7 @@ class StatApi < Sinatra::Base
     data = JSON.parse(request.body.read)['data']
     mean = data.sum(0.0) / data.length
 
-    return { mean: mean }.to_json
+    return { mean: }.to_json
   end
 
   post '/median' do
@@ -29,7 +31,7 @@ class StatApi < Sinatra::Base
                ].sum(0.0) / 2
              end
 
-    return { median: median }.to_json
+    return { median: }.to_json
   end
 
   post '/mode' do
@@ -49,6 +51,21 @@ class StatApi < Sinatra::Base
       value == value_count.values.max
     end.keys
 
-    return { mode: mode }.to_json
+    return { mode: }.to_json
+  end
+
+  post '/standard_deviation' do
+    content_type 'application/json'
+
+    data, sample_flag = JSON.parse(request.body.read).values
+    mean = data.sum(0.0) / data.length
+    length = sample_flag ? data.length - 1 : data.length
+    standard_deviation = Math.sqrt(
+      data.map do |val|
+        ((val.to_f - mean)**2)
+      end.sum / length
+    )
+
+    return { standard_deviation: }.to_json
   end
 end
