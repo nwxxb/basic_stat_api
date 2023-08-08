@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'calculate mode' do
+RSpec.describe 'calculate mode', type: :feature do
   def app
     StatApi
   end

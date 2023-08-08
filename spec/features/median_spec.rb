@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'calculate median/middle value' do
+RSpec.describe 'calculate median/middle value', type: :feature do
   def app
     StatApi
   end
