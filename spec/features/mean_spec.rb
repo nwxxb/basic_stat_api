@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'Calculate Mean/Average' do
+RSpec.describe 'Calculate Mean/Average', type: :feature do
   def app
     StatApi
   end

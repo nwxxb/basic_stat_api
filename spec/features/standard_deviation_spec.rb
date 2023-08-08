@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'Calculate Standard Deviation' do
+RSpec.describe 'Calculate Standard Deviation', type: :feature do
   def app
     StatApi
   end

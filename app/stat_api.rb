@@ -2,9 +2,12 @@
 
 # Class that contains all required endpoints
 class StatApi < Sinatra::Base
+  use CustomRateLimiter, limit: 100, duration: 86_400
   use Rack::PostBodyContentTypeParser
 
   get '/ping' do
+    content_type 'text/plain'
+
     'pong'
   end
 
