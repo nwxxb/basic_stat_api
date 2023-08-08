@@ -5,3 +5,6 @@ require:
 
 MultipleExpectations:
   Enabled: false
+
+ExampleLength:
+  Max: 8

@@ -96,6 +96,17 @@ RSpec.configure do |config|
   #     --seed 1234
   config.order = :random
 
+  config.around(:context, type: :feature) do |example|
+    redis = Redis.new
+    keys = redis.scan_each(match: 'test:*').to_a
+    keys.each { |key| redis.del key }
+
+    example.run
+
+    keys = redis.scan_each(match: 'test:*').to_a
+    keys.each { |key| redis.del key }
+  end
+
   # Seed global randomization in this process using the `--seed` CLI option.
   # Setting this allows you to use `--seed` to deterministically reproduce
   # test failures related to randomization by passing the same `--seed` value
