@@ -22,5 +22,5 @@ bundle exec rubocop
 bundle exec ripper-tags -R --extra=q .
 
 # run server
-rackup
+bundle exec shotgun config.ru
 ```
