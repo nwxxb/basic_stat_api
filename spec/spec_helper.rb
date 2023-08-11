@@ -97,14 +97,14 @@ RSpec.configure do |config|
   config.order = :random
 
   config.around(:context, type: :feature) do |example|
-    redis = Redis.new
-    keys = redis.scan_each(match: 'test:*').to_a
-    keys.each { |key| redis.del key }
+    redis = Redis.new(
+      host: ENV['REDIS_HOST'], port: ENV['REDIS_PORT'], db: ENV['REDIS_DB']
+    )
+    redis.flushdb
 
     example.run
 
-    keys = redis.scan_each(match: 'test:*').to_a
-    keys.each { |key| redis.del key }
+    redis.flushdb
   end
 
   # Seed global randomization in this process using the `--seed` CLI option.
