@@ -2,15 +2,17 @@
 
 source 'https://rubygems.org'
 
+gem 'dotenv'
 gem 'puma'
 gem 'rack'
 gem 'rack-contrib'
-gem 'shotgun3'
 gem 'redis'
+gem 'shotgun3'
 gem 'sinatra'
 
 group :development, :test do
   gem 'pry'
+  gem 'pry-remote'
   gem 'ripper-tags', require: false
   gem 'rubocop', '~> 1.54', require: false
   gem 'rubocop-rspec', '~> 2.22', require: false
