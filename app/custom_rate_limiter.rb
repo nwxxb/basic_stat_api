@@ -6,11 +6,13 @@ class CustomRateLimiter
     @app = app
     @limit = limit
     @duration = duration
-    @redis = Redis.new
+    @redis = Redis.new(
+      host: ENV['REDIS_HOST'], port: ENV['REDIS_PORT'], db: ENV['REDIS_DB']
+    )
   end
 
   def call(env)
-    key =  "#{ENV['RACK_ENV']}:limit:#{env['REMOTE_ADDR']}"
+    key = "limit:#{env['REMOTE_ADDR']}"
     count = @redis.incr(key)
     @redis.expire(key, @duration) if count == 1
 

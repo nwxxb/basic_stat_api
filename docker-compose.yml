@@ -1,0 +1,33 @@
+version: '3.8'
+
+services: 
+  redis:
+    image: redis
+    volumes:
+      - redis-data:/data
+    networks:
+      - basic_stat_api_net
+    ports:
+      - 6379
+  app:
+    build: .
+    container_name: basic_stat_api
+    depends_on: 
+      - redis
+    command: bundle exec shotgun --host=0.0.0.0 --port=3000 config.ru
+    tty: true
+    stdin_open: true
+    ports:
+      - "3000:3000"
+    networks:
+      - basic_stat_api_net
+    volumes:
+      - .:/code
+
+volumes:
+  redis-data:
+
+networks:
+  basic_stat_api_net:
+    driver: bridge
+    name: basic_stat_api_net
