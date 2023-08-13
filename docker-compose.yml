@@ -23,9 +23,11 @@ services:
       - basic_stat_api_net
     volumes:
       - .:/code
+      - bundle-cache:/usr/local/bundle
 
 volumes:
   redis-data:
+  bundle-cache:
 
 networks:
   basic_stat_api_net:
