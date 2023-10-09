@@ -6,9 +6,9 @@ FIXED_DURATION = 10
 RSpec.describe 'Apply Rate limiting', type: :feature do
   def app
     Rack::Builder.new do
-      use(CustomRateLimiter, limit: FIXED_LIMIT, duration: FIXED_DURATION)
+      use(BasicStatApi::CustomRateLimiter, limit: FIXED_LIMIT, duration: FIXED_DURATION)
 
-      run Rack::URLMap.new('/' => StatApi)
+      run Rack::URLMap.new('/' => BasicStatApi::Routes)
     end
   end
 
