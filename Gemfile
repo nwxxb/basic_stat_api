@@ -21,4 +21,5 @@ end
 group :test do
   gem 'rack-test', '~> 2.1'
   gem 'rspec'
+  gem 'simplecov', require: false
 end

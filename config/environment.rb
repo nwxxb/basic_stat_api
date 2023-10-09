@@ -4,6 +4,11 @@ require 'bundler/setup'
 Bundler.require(:default)
 Bundler.require(Sinatra::Base.environment)
 Dotenv.load(".env.#{ENV['RACK_ENV']}")
-Dir['./app/*.rb'].sort.each do |file|
-  require file
+
+# top level module / namespace
+module BasicStatApi
 end
+
+require './app/custom_rate_limiter'
+require './app/routes'
+require './app/main_app'
