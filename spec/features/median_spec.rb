@@ -3,6 +3,7 @@
 RSpec.describe '/median endpoint', type: :feature do
   def app
     Rack::Builder.new do
+      use(BasicStatApi::CustomRateLimiter, limit: 10, duration: 3600)
       run Rack::URLMap.new('/' => BasicStatApi::Routes)
     end
   end
