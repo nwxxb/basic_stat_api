@@ -19,4 +19,13 @@ RSpec.describe '/summary endpoint', type: :feature do
     expect(JSON.parse(last_response.body)['mode']).to eq([50])
     expect(JSON.parse(last_response.body)['standard_deviation']).to be_within(0.01).of(17.895197)
   end
+
+  it 'return 400 code for invalid input' do
+    setup_header(content_type: 'application/json', accept: 'application/json')
+
+    post('/summary', {}.to_json)
+    expect(last_response.status).to eq(400)
+    expect(last_response.content_type).to eq('application/json')
+    expect(JSON.parse(last_response.body)['error']).to eq('invalid input')
+  end
 end
