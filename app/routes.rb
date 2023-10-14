@@ -119,13 +119,18 @@ module BasicStatApi
 
     post '/summary' do
       content_type 'application/json'
-      data, sample_flag = JSON.parse(request.body.read).values
-      return {
-        mean: mean(data),
-        median: median(data),
-        mode: mode(data),
-        standard_deviation: standard_deviation(data, sample_flag)
-      }.to_json
+
+      begin
+        data, sample_flag = JSON.parse(request.body.read).values
+        return {
+          mean: mean(data),
+          median: median(data),
+          mode: mode(data),
+          standard_deviation: standard_deviation(data, sample_flag)
+        }.to_json
+      rescue JSON::GeneratorError, NoMethodError
+        error 400, { error: 'invalid input' }.to_json
+      end
     end
   end
 end
