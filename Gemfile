@@ -3,13 +3,13 @@
 source 'https://rubygems.org'
 
 gem 'dotenv'
+gem 'gr-plot'
 gem 'puma'
 gem 'rack'
 gem 'rack-contrib'
 gem 'redis'
 gem 'shotgun3'
 gem 'sinatra'
-gem 'gr-plot'
 
 group :development, :test do
   gem 'pry'

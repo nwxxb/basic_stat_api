@@ -118,37 +118,35 @@ module BasicStatApi
     end
 
     post '/summary' do
-      begin
-        data, sample_flag = JSON.parse(request.body.read).values
-        if request.env['HTTP_ACCEPT'] == 'application/json'
-          content_type 'application/json'
-          return {
-            mean: mean(data),
-            median: median(data),
-            mode: mode(data),
-            standard_deviation: standard_deviation(data, sample_flag)
-          }.to_json
-        elsif request.env['HTTP_ACCEPT'] == 'image/jpg'
-          content_type 'image/jpg'
-          counted_data = data.sort.each_with_object(Hash.new(0)) do |val, counts|
-            counts[val] += 1
-          end
-          begin
-            x = counted_data.keys
-            y = counted_data.values
-            plot = Tempfile.new(['test', '.jpg'])
-            GR.barplot(x, y, ylim: [0, counted_data.values.max + 10])
-            GR.savefig(plot.path)
-            return plot.read
-          ensure
-            plot.close
-            plot.unlink
-          end
-        end
-      rescue JSON::GeneratorError, NoMethodError
+      data, sample_flag = JSON.parse(request.body.read).values
+      if request.env['HTTP_ACCEPT'] == 'application/json'
         content_type 'application/json'
-        error 400, { error: 'invalid input' }.to_json
+        return {
+          mean: mean(data),
+          median: median(data),
+          mode: mode(data),
+          standard_deviation: standard_deviation(data, sample_flag)
+        }.to_json
+      elsif request.env['HTTP_ACCEPT'] == 'image/jpg'
+        content_type 'image/jpg'
+        counted_data = data.sort.each_with_object(Hash.new(0)) do |val, counts|
+          counts[val] += 1
+        end
+        begin
+          x = counted_data.keys
+          y = counted_data.values
+          plot = Tempfile.new(['test', '.jpg'])
+          GR.barplot(x, y, ylim: [0, counted_data.values.max + 10])
+          GR.savefig(plot.path)
+          return plot.read
+        ensure
+          plot.close
+          plot.unlink
+        end
       end
+    rescue JSON::GeneratorError, NoMethodError
+      content_type 'application/json'
+      error 400, { error: 'invalid input' }.to_json
     end
   end
 end
