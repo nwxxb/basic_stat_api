@@ -7,16 +7,21 @@ GEM
     diff-lcs (1.5.0)
     docile (1.4.0)
     dotenv (2.8.1)
+    fiddle (1.1.1)
+    gr-plot (0.0.1)
+      ruby-gr
     json (2.6.3)
     language_server-protocol (3.17.0.3)
     method_source (1.0.0)
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
     nio4r (2.5.8)
+    numo-narray (0.9.2.1)
     parallel (1.23.0)
     parser (3.2.2.3)
       ast (~> 2.4.1)
       racc
+    pkg-config (1.5.5)
     pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -75,6 +80,10 @@ GEM
       rubocop (~> 1.33)
       rubocop-capybara (~> 2.17)
       rubocop-factory_bot (~> 2.22)
+    ruby-gr (0.72.9.0)
+      fiddle (>= 1.1.0)
+      numo-narray
+      pkg-config
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
     shotgun3 (1.0.0)
@@ -99,6 +108,7 @@ PLATFORMS
 
 DEPENDENCIES
   dotenv
+  gr-plot
   pry
   pry-remote
   puma
