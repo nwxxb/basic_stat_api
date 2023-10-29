@@ -133,13 +133,16 @@ module BasicStatApi
           counted_data = data.sort.each_with_object(Hash.new(0)) do |val, counts|
             counts[val] += 1
           end
-          x = counted_data.keys
-          y = counted_data.values
-          Tempfile.open(['test', '.jpg']) do |f|
-            # GR.plot(x, y, ylim: [0, counted_data.values.max + 1])
+          begin
+            x = counted_data.keys
+            y = counted_data.values
+            plot = Tempfile.new(['test', '.jpg'])
             GR.barplot(x, y, ylim: [0, counted_data.values.max + 10])
-            GR.savefig(f.path)
-            return f.read
+            GR.savefig(plot.path)
+            return plot.read
+          ensure
+            plot.close
+            plot.unlink
           end
         end
       rescue JSON::GeneratorError, NoMethodError
