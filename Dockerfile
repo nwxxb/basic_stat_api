@@ -1,8 +1,16 @@
 FROM ruby:3.1.2
 
+RUN apt update -y
+RUN apt install libgs-dev -y
+ADD https://gr-framework.org/downloads/gr-latest-Debian-x86_64.tar.gz /gr.tar.gz 
+RUN tar -xvf /gr.tar.gz
+ENV GRDIR="/gr"
+
 WORKDIR /code
 
 COPY . /code
+
+# install GR framework for plotting
 
 RUN bundle install
 

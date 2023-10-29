@@ -3,6 +3,7 @@
 source 'https://rubygems.org'
 
 gem 'dotenv'
+gem 'gr-plot'
 gem 'puma'
 gem 'rack'
 gem 'rack-contrib'
