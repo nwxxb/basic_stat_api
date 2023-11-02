@@ -103,18 +103,8 @@ module BasicStatApi
     end
 
     get '/' do
-      # please list all available endpoints here
-      content_type 'application/json'
-      url_info = {}
-      self.class.routes.each_pair do |method, list|
-        next unless method != 'HEAD'
-
-        url_info[method] = list.map do |route|
-          request.url + route.first.to_s[1..]
-        end
-      end
-
-      return url_info.to_json
+      # please list all available routes here
+      erb :index
     end
 
     post '/summary' do
