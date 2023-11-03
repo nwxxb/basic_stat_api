@@ -2,7 +2,7 @@
 
 module BasicStatApi
   # Routes: contains all required endpoints
-  class Routes < Sinatra::Base
+  class Calculations < Sinatra::Base
     get '/ping' do
       content_type 'text/plain'
 
@@ -100,11 +100,6 @@ module BasicStatApi
       rescue JSON::GeneratorError, NoMethodError
         error 400, { error: 'invalid input' }.to_json
       end
-    end
-
-    get '/' do
-      # please list all available routes here
-      erb :index
     end
 
     post '/summary' do

@@ -2,10 +2,17 @@
 
 module BasicStatApi
   # Main App, compile all needed components like middleware and route
-  class MainApp < Sinatra::Base
-    use BasicStatApi::CustomRateLimiter, limit: 100, duration: 86_400
-    use Rack::JSONBodyParser
+  class MainApp
+    def initialize(rate_limit:, rate_duration:)
+      @app = Rack::Builder.new do
+        use(BasicStatApi::CustomRateLimiter, limit: rate_limit, duration: rate_duration)
+        map('/api') { run BasicStatApi::Calculations }
+        map('/') { run Sinatra.new { get('/') { erb :index } } }
+      end
+    end
 
-    use BasicStatApi::Routes
+    def call(env)
+      @app.call(env)
+    end
   end
 end

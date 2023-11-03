@@ -10,5 +10,5 @@ module BasicStatApi
 end
 
 require './app/custom_rate_limiter'
-require './app/routes'
+require './app/calculations'
 require './app/main_app'
