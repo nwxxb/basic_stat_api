@@ -11,12 +11,22 @@ module BasicStatApi
           exceptions: rate_exceptions_condition
         )
         map('/api') { run BasicStatApi::Calculations }
-        map('/') { run Sinatra.new { get('/') { erb :index } } }
+        map('/') { run BasicStatApi::Pages }
       end
     end
 
     def call(env)
       @app.call(env)
+    end
+  end
+end
+
+module BasicStatApi
+  class Pages < Sinatra::Base
+    set :public_folder, 'public'
+
+    get('/') do
+      erb :index
     end
   end
 end
