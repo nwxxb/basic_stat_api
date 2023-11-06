@@ -20,6 +20,8 @@ group :development, :test do
 end
 
 group :test do
+  gem 'capybara'
+  gem 'cuprite'
   gem 'rack-test', '~> 2.1'
   gem 'rspec'
   gem 'simplecov', require: false
