@@ -1,7 +1,7 @@
 const demoForm = document.getElementById("demo_form");
-const demo = document.getElementById("demo");
+const demo = document.getElementById("demo_results");
 const demoGraph = document.getElementById("demo_graph");
-const demoResults = document.getElementById("demo_results");
+const demoResults = document.getElementById("demo_value");
 
 demo.style.display = "none"
 
