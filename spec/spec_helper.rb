@@ -20,10 +20,36 @@ require 'simplecov'
 SimpleCov.start
 require './config/environment'
 require './spec/support/custom_helpers'
+require 'capybara/rspec'
+require 'capybara/cuprite'
+
+CHROME_URL = "http://chrome:3333"
+REMOTE_CHROME_HOST, REMOTE_CHROME_PORT = 
+  if CHROME_URL
+    URI.parse(CHROME_URL).yield_self do |uri|
+      [uri.host, uri.port]
+    end
+  end
+Capybara.register_driver(:better_cuprite) do |app|
+  Capybara::Cuprite::Driver.new(
+    app,
+    {
+      url: CHROME_URL,
+      window_size: [1200, 800],
+      browser_options: { "no-sandbox" => nil },
+      inspector: true
+    }
+  )
+end
+Capybara.javascript_driver = :better_cuprite
+Capybara.server_host = Socket.ip_address_list.find(&:ipv4_private?)&.ip_address
+Capybara.server_port = 8200
+Capybara.always_include_port = true
 
 RSpec.configure do |config|
   config.include Rack::Test::Methods
   config.include CustomHelpers
+  config.include Capybara::DSL
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.
