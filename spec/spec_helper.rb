@@ -23,33 +23,49 @@ require './spec/support/custom_helpers'
 require 'capybara/rspec'
 require 'capybara/cuprite'
 
-CHROME_URL = "http://chrome:3333"
-REMOTE_CHROME_HOST, REMOTE_CHROME_PORT = 
-  if CHROME_URL
-    URI.parse(CHROME_URL).yield_self do |uri|
-      [uri.host, uri.port]
+# not like selenium, error on cuprite driver (even the default one) 
+# affecting on another test that not using any javascript driver
+begin
+  CHROME_URL = 'http://chrome:3333'
+  CHROME_HOST, CHROME_PORT =
+    if CHROME_URL
+      URI.parse(CHROME_URL).yield_self do |uri|
+        [uri.host, uri.port]
+      end
     end
+  TCPSocket.new(CHROME_HOST, CHROME_PORT)
+rescue SocketError
+  Capybara.register_driver(:empty) do |_app|
+    Class.new do
+      def method_missing(_m, *_args)
+        raise "It seems that your cuprite doesn't working properly"
+      end
+    end.new
   end
-Capybara.register_driver(:better_cuprite) do |app|
-  Capybara::Cuprite::Driver.new(
-    app,
-    {
-      url: CHROME_URL,
-      window_size: [1200, 800],
-      browser_options: { "no-sandbox" => nil },
-      inspector: true
-    }
-  )
+  Capybara.javascript_driver = :empty
+else
+  Capybara.register_driver(:cuprite) do |app|
+    Capybara::Cuprite::Driver.new(
+      app,
+      {
+        url: CHROME_URL,
+        window_size: [1200, 800],
+        browser_options: { 'no-sandbox' => nil },
+        inspector: true
+      }
+    )
+  end
+
+  Capybara.server_host = Socket.ip_address_list.find(&:ipv5_private?)&.ip_address
+  Capybara.server_port = 8200
+  Capybara.always_include_port = true
+  Capybara.javascript_driver = :cuprite
 end
-Capybara.javascript_driver = :better_cuprite
-Capybara.server_host = Socket.ip_address_list.find(&:ipv4_private?)&.ip_address
-Capybara.server_port = 8200
-Capybara.always_include_port = true
 
 RSpec.configure do |config|
   config.include Rack::Test::Methods
   config.include CustomHelpers
-  config.include Capybara::DSL
+  config.include Capybara::DSL, type: :feature
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.
@@ -124,10 +140,11 @@ RSpec.configure do |config|
   #     --seed 1234
   config.order = :random
 
-  config.around(:context, type: :feature) do |example|
-    redis = Redis.new(
-      host: ENV['REDIS_HOST'], port: ENV['REDIS_PORT'], db: ENV['REDIS_DB']
-    )
+  redis = Redis.new(
+    host: ENV['REDIS_HOST'], port: ENV['REDIS_PORT'], db: ENV['REDIS_DB']
+  )
+
+  config.around(:example, type: :feature) do |example|
     redis.flushdb
 
     example.run
