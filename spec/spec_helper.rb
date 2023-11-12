@@ -26,40 +26,58 @@ require 'capybara/cuprite'
 # not like selenium, error on cuprite driver (even the default one) 
 # affecting on another test that not using any javascript driver
 begin
-  CHROME_URL = 'http://chrome:3333'
-  CHROME_HOST, CHROME_PORT =
-    if CHROME_URL
-      URI.parse(CHROME_URL).yield_self do |uri|
-        [uri.host, uri.port]
+  remote_flag = nil
+  if ENV['CHROME_URL']
+    CHROME_URL = ENV['CHROME_URL']
+    CHROME_HOST, CHROME_PORT =
+      if CHROME_URL
+        URI.parse(CHROME_URL).yield_self do |uri|
+          [uri.host, uri.port]
+        end
       end
-    end
-  TCPSocket.new(CHROME_HOST, CHROME_PORT)
-rescue SocketError
+    TCPSocket.new(CHROME_HOST, CHROME_PORT)
+    remote_flag = true
+  else
+    Ferrum::Browser.new
+    remote_flag = false
+  end
+
+  options = {
+    window_size: [1200, 800],
+    inspector: true
+  }
+
+  options.merge!({
+    url: ENV['CHROME_URL'],
+    browser_options: { 'no-sandbox' => nil }
+  }) if remote_flag
+
+  Capybara.register_driver(:cuprite) do |app|
+    Capybara::Cuprite::Driver.new(app, options)
+  end
+
+  Capybara.server_host = if ENV['CHROME_URL']
+                           Socket.ip_address_list.find(&:ipv4_private?)&.ip_address
+                         else
+                           'localhost'
+                         end
+  Capybara.server_port = 8201
+  Capybara.always_include_port = true
+  Capybara.javascript_driver = :cuprite
+rescue SocketError, Ferrum::BinaryNotFoundError => e
   Capybara.register_driver(:empty) do |_app|
     Class.new do
       def method_missing(_m, *_args)
-        raise "It seems that your cuprite doesn't working properly"
+        error_msg = <<~ERROR
+          It seems that your cuprite doesn't working properly
+          please check your CHROME_URL if you use remote docker
+          or your chrome binary (check your PATH or BROWSER_PATH)
+        ERROR
+        raise error_msg
       end
     end.new
   end
   Capybara.javascript_driver = :empty
-else
-  Capybara.register_driver(:cuprite) do |app|
-    Capybara::Cuprite::Driver.new(
-      app,
-      {
-        url: CHROME_URL,
-        window_size: [1200, 800],
-        browser_options: { 'no-sandbox' => nil },
-        inspector: true
-      }
-    )
-  end
-
-  Capybara.server_host = Socket.ip_address_list.find(&:ipv5_private?)&.ip_address
-  Capybara.server_port = 8200
-  Capybara.always_include_port = true
-  Capybara.javascript_driver = :cuprite
 end
 
 RSpec.configure do |config|

@@ -19,9 +19,8 @@ module BasicStatApi
       @app.call(env)
     end
   end
-end
 
-module BasicStatApi
+  # Handle Static Pages
   class Pages < Sinatra::Base
     set :public_folder, 'public'
 
