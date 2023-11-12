@@ -20,10 +20,72 @@ require 'simplecov'
 SimpleCov.start
 require './config/environment'
 require './spec/support/custom_helpers'
+require 'capybara/rspec'
+require 'capybara/cuprite'
+
+# not like selenium, error on cuprite driver (even the default one)
+# affecting on another test that not using any javascript driver
+begin
+  remote_flag = nil
+  if ENV['CHROME_URL']
+    CHROME_URL = ENV['CHROME_URL']
+    CHROME_HOST, CHROME_PORT =
+      if CHROME_URL
+        URI.parse(CHROME_URL).yield_self do |uri|
+          [uri.host, uri.port]
+        end
+      end
+    TCPSocket.new(CHROME_HOST, CHROME_PORT)
+    remote_flag = true
+  else
+    Ferrum::Browser.new
+    remote_flag = false
+  end
+
+  options = {
+    window_size: [1200, 800],
+    inspector: true
+  }
+
+  if remote_flag
+    options.merge!({
+                     url: ENV['CHROME_URL'],
+                     browser_options: { 'no-sandbox' => nil }
+                   })
+  end
+
+  Capybara.register_driver(:cuprite) do |app|
+    Capybara::Cuprite::Driver.new(app, options)
+  end
+
+  Capybara.server_host = if ENV['CHROME_URL']
+                           Socket.ip_address_list.find(&:ipv4_private?)&.ip_address
+                         else
+                           'localhost'
+                         end
+  Capybara.server_port = 8201
+  Capybara.always_include_port = true
+  Capybara.javascript_driver = :cuprite
+rescue SocketError, Ferrum::BinaryNotFoundError
+  Capybara.register_driver(:empty) do |_app|
+    Class.new do
+      def method_missing(_m, *_args)
+        error_msg = <<~ERROR
+          It seems that your cuprite doesn't working properly
+          please check your CHROME_URL if you use remote docker
+          or your chrome binary (check your PATH or BROWSER_PATH)
+        ERROR
+        raise error_msg
+      end
+    end.new
+  end
+  Capybara.javascript_driver = :empty
+end
 
 RSpec.configure do |config|
   config.include Rack::Test::Methods
   config.include CustomHelpers
+  config.include Capybara::DSL, type: :feature
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.
@@ -98,10 +160,11 @@ RSpec.configure do |config|
   #     --seed 1234
   config.order = :random
 
-  config.around(:context, type: :feature) do |example|
-    redis = Redis.new(
-      host: ENV['REDIS_HOST'], port: ENV['REDIS_PORT'], db: ENV['REDIS_DB']
-    )
+  redis = Redis.new(
+    host: ENV['REDIS_HOST'], port: ENV['REDIS_PORT'], db: ENV['REDIS_DB']
+  )
+
+  config.around(:example, type: :feature) do |example|
     redis.flushdb
 
     example.run

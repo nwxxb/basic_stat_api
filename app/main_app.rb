@@ -6,17 +6,26 @@ module BasicStatApi
     def initialize(rate_limit:, rate_duration:, rate_exceptions_condition: nil)
       @app = Rack::Builder.new do
         use(
-          BasicStatApi::CustomRateLimiter, 
+          BasicStatApi::CustomRateLimiter,
           limit: rate_limit, duration: rate_duration,
           exceptions: rate_exceptions_condition
         )
         map('/api') { run BasicStatApi::Calculations }
-        map('/') { run Sinatra.new { get('/') { erb :index } } }
+        map('/') { run BasicStatApi::Pages }
       end
     end
 
     def call(env)
       @app.call(env)
+    end
+  end
+
+  # Handle Static Pages
+  class Pages < Sinatra::Base
+    set :public_folder, 'public'
+
+    get('/') do
+      erb :index
     end
   end
 end

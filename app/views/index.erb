@@ -7,76 +7,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
-    <form id="demo_form">
-      <label>
-        Data Payload
-        <input type="text" name="data" />
-      </label>
-      <label>
-        Sample Flag
-        <input type="checkbox" name="is_sample" />
-      </label>
-      <input type="submit" value="Submit" />
-    </form>
-    <div id="demo">
-      <img id="demo_graph" src="" width="500"/>
-      <ul id="demo_results">
-      </ul>
-    </div>
-    <script>
-      const demoForm = document.getElementById("demo_form");
-      const demo = document.getElementById("demo");
-      const demoGraph = document.getElementById("demo_graph");
-      const demoResults = document.getElementById("demo_results");
-
-      demo.style.display = "none"
-
-      async function getStatData(data, headers) {
-              const response = await fetch(
-                `${window.location.origin}/api/summary`,
-                {
-                        method: "POST",
-                        headers: headers,
-                        body: data
-                }
-              )
-              if (headers['Accept'] == 'application/json') {
-                      return await response.json()
-              } else if (headers['Accept'] == 'image/jpg') {
-                      return await response.blob()
-              }
-      }
-
-      demoForm.addEventListener("submit", (e) => {
-              e.preventDefault()
-              const formData = new FormData(e.currentTarget);
-              const headersForResult = {
-                      "Content-Type": "application/json",
-                      "Accept": "application/json"
-              }
-              const headersForGraph = {
-                      "Content-Type": "application/json",
-                      "Accept": "image/jpg"
-              }
-              const dataPayload = JSON.stringify({
-                'data': formData.get('data').split(',').map(val => Number(val)),
-                'is_sample': formData.get('is_sample') == 'on' ? true : false
-              });
-              getStatData(dataPayload, headersForResult).then(data => {
-                      demo.style.display = "block"
-                      demoResults.innerHTML = ''
-                      for (const [key, value] of Object.entries(data)) {
-                        let newLi = document.createElement("li")
-                        newLi.appendChild(document.createTextNode(key + " : " + value))
-                        demoResults.appendChild(newLi)
-                      }
-
-              })
-              getStatData(dataPayload, headersForGraph).then(data => {
-                      const url = URL.createObjectURL(data)
-                      demoGraph.src = url
-              })
-      })
-    </script>
+    <header>
+      <h1>Basic Stat Api</h1>
+      <p>
+        this API is my own 'media' to discover testing, modularity, and brush up on my programming skills. I am not putting too much attention on the math side.
+      </p>
+      <span>see full code on <a href="https://github.com/nwxxb/basic_stat_api">github</a></span>
+    </header>
+    <main>
+      <section id="demo">
+        <form id="demo_form">
+          <label>
+            Data Payload
+            <input type="text" name="data" />
+          </label>
+          <label>
+            Sample Flag
+            <input type="checkbox" name="is_sample" />
+          </label>
+          <input type="submit" value="Submit" />
+        </form>
+        <div id="demo_results">
+          <img id="demo_graph" src="" width="500" height="400"/>
+          <ul id="demo_value">
+          </ul>
+        </div>
+      </section>
+    </main>
   </body>
+  <script src="/index.js"></script>
 </html>
