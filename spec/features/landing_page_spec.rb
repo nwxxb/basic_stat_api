@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'landing page', type: :feature do
+RSpec.describe 'Landing page', type: :feature do
   def app
     Rack::Builder.new do
       map('/api') { run BasicStatApi::Calculations }

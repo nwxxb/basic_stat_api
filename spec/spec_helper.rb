@@ -23,7 +23,7 @@ require './spec/support/custom_helpers'
 require 'capybara/rspec'
 require 'capybara/cuprite'
 
-# not like selenium, error on cuprite driver (even the default one) 
+# not like selenium, error on cuprite driver (even the default one)
 # affecting on another test that not using any javascript driver
 begin
   remote_flag = nil
@@ -47,10 +47,12 @@ begin
     inspector: true
   }
 
-  options.merge!({
-    url: ENV['CHROME_URL'],
-    browser_options: { 'no-sandbox' => nil }
-  }) if remote_flag
+  if remote_flag
+    options.merge!({
+                     url: ENV['CHROME_URL'],
+                     browser_options: { 'no-sandbox' => nil }
+                   })
+  end
 
   Capybara.register_driver(:cuprite) do |app|
     Capybara::Cuprite::Driver.new(app, options)
@@ -64,7 +66,7 @@ begin
   Capybara.server_port = 8201
   Capybara.always_include_port = true
   Capybara.javascript_driver = :cuprite
-rescue SocketError, Ferrum::BinaryNotFoundError => e
+rescue SocketError, Ferrum::BinaryNotFoundError
   Capybara.register_driver(:empty) do |_app|
     Class.new do
       def method_missing(_m, *_args)

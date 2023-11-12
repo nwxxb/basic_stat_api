@@ -6,7 +6,7 @@ module BasicStatApi
     def initialize(rate_limit:, rate_duration:, rate_exceptions_condition: nil)
       @app = Rack::Builder.new do
         use(
-          BasicStatApi::CustomRateLimiter, 
+          BasicStatApi::CustomRateLimiter,
           limit: rate_limit, duration: rate_duration,
           exceptions: rate_exceptions_condition
         )
