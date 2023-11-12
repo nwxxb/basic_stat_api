@@ -23,7 +23,7 @@ RSpec.describe 'Apply Rate limiting', type: :feature do
 
     expect(last_response.status).to eq(200)
   end
-
+  
   it 'working fine exception conditions is satisfied' do
     get('/bypass')
     (FIXED_LIMIT + 1).times do
