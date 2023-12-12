@@ -9,7 +9,7 @@ demoForm.addEventListener("submit", (e) => {
       e.preventDefault()
       const formData = new FormData(e.currentTarget);
       const dataPayload = JSON.stringify({
-	'data': formData.get('data').split(',').map(val => Number(val)),
+	'data': formData.get('data').match(/\d+/g).map(val => Number(val)),
 	'is_sample': formData.get('is_sample') == 'on' ? true : false
       });
 
